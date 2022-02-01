@@ -2,8 +2,8 @@
 %Input pressure function and symbolic computes refractive index and other
 %functions
 
-n = @(x,y) 2./(1+(a.^2+b.^2)); %Newton's fisheye lens refractive index
-gradn= symfun(gradient(n,[a,b]),[a,b]);
+n = @(x,y) 2./(1+(x.^2+y.^2)); %Newton's fisheye lens refractive index
+gradn= symfun(gradient(n,[x,y]),[x,y]);
 
 ngradn =@(x,y) double( n(x,y).*gradn(x,y)); % represents n(r)*gradient(n(r)) is equal to acceleration function.
 
