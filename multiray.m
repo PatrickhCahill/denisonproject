@@ -19,7 +19,8 @@ y0 = 5;
 Tx0 = 1;      
 Ty0 = 0; 
 for i = 0:5:45
-    w = trace(x0,y0+i,Tx0,Ty0);
+    pos = [x0;y0+i;Tx0;Ty0];
+    w = trace(pos,ngradn);
     final = extrapolate(w);
     plot(final(:,1),final(:,2),'-b')
     hold on
@@ -37,30 +38,4 @@ function output = extrapolate(w)
     grad = (y2-y1)/(x2-x1);
     xend = (-y2)/grad+x2;
     output = [x2,y2;xend,0];
-end
-function output = trace(x0,y0,Tx0,Ty0)
-tSpan = linspace(0,500,100);
-
-      
-
-
-% ode45 then solves this using the derivatives function. @derivatives calls
-% the function derivatives as an object. This allows us just to change
-% derivatives.
-options = odeset('RelTol',1e-12,'Stats','off');
-[t,w] = ode45(@ray_equation, tSpan, [x0; y0; Tx0; Ty0],options); %increase precision relative tolerance
-    
-    % Ray equation for geometrical optics.
-    function output = ray_equation(tf,wf)
-        global ngradn
-        rf = [wf(1); wf(2)]; %radial vector as function of t
-        Tf = [wf(3);wf(4)]; % optical ray vector as function of r.
-        
-        drdt = Tf;
-        dTdt = ngradn(rf(1),rf(2));
-
-        output = [drdt;dTdt];      
-
-    end
-    output = w;
 end
