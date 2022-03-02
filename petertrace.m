@@ -1,4 +1,4 @@
-function output = petertrace(pos,n,x1) %pos = [x0;y0;Tx0;Ty0]
+function output = petertrace(pos,n,x1,xend) %pos = [x0;y0;Tx0;Ty0]
 syms x y z
 
 if ~exist('tol','var')
@@ -11,9 +11,9 @@ grady = symfun(diff(n,y),[x,y]);
 grady = @(x,y) double(grady(x,y));
 Ty = @(y) pos(4)+integral(@(x) grady(x,y),pos(1),x1);
 
-xend = x1-pos(2)*Tx(pos(2))/Ty(pos(2));
+yend = pos(2)+(xend-x1)*Ty(pos(2))/Tx(pos(2));
 
-output = [x1,pos(2);xend,0];
+output = [x1,pos(2);xend,yend];
 end
 
 

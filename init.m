@@ -6,6 +6,8 @@ alpha = 1.642e-30; %polarizability
 eps0 = 8.854187817e-12; 
 k = 1.38064852e-23; %boltzmann
 avagadro =6.02214086e23 ;
+R=8.314;
+
 
 t = 0.1;
 gasmass = 6000;

@@ -22,7 +22,7 @@ p1 = plot(final(:,1),final(:,2),'-b','DisplayName',"Runge-Katte Raytracing" );
 xlim([0,20e9])
 xlabel("x (m)")
 ylabel("y (m)")
-title("Runge-Katte Integration and Peter's Approximation")
+title("Runge-Katte Integration and Tracing Approximation")
 
 gradx = symfun(diff(n,x),[x,y]);
 gradx = @(x,y) double(gradx(x,y));
@@ -41,7 +41,7 @@ for i = 0:5:45
     hold on
 
 end
-p2 = plot([20;xend],[y0+i;0],'-.r','DisplayName',"Peter's Approximation");
+p2 = plot([20;xend],[y0+i;0],'-.r','DisplayName',"Tracing Approximation");
 legend([p1,p2])
 
 

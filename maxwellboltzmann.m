@@ -1,14 +1,14 @@
 %% BOLTZMANN LENS
 %Input pressure function and symbolic computes refractive index and other
 %functions
+init()
 
+p = @(x,y) (N/t^3)*(beta0/pi)^(3/2)*exp(-beta0*(x^2+y^2)/t^2); %Boltzmann distribution
 
-p = @(a,b) (N/t^3)*(beta0/pi)^(3/2)*exp(-beta0*(a^2+b^2)/t^2); %Boltzmann distribution
+n = @(x,y) 1+p(x,y)*2*pi*alpha;
+gradn= symfun(gradient(n,[x,y]),[x,y]);
 
-n = @(a,b) 1+p(a,b)*2*pi*alpha;
-gradn= symfun(gradient(n,[a,b]),[a,b]);
-
-ngradn =@(a,b) double( n(a,b).*gradn(a,b)); % represents n(r)*gradient(n(r)) is equal to acceleration function.
+ngradn =@(x,y) double( n(x,y).*gradn(x,y)); % represents n(r)*gradient(n(r)) is equal to acceleration function.
 
 % trace() then computes the path of the ray.
 %Initial conditions

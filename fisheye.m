@@ -25,3 +25,4 @@ tSpan = linspace(0,25,100);
 
 w = trace(pos,ngradn,1e-12,tSpan);
 plot(w(:,1),w(:,2))
+title("Maxwell Fisheye Lens")

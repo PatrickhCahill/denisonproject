@@ -3,7 +3,7 @@
 %functions
 
 
-p = @(x,y) (N/t^3)*(beta0/pi)^(3/2)*exp(-beta0*(x.^2+y.^2)/t^2); %Boltzmann distribution
+p = @(x,y) (N/t^3)*(beta0/pi)^(3/2).*exp(-beta0*(x.^2+y.^2)/t^2); %Boltzmann distribution
 
 n = @(x,y) 1+p(x,y)*2*pi*alpha;
 gradn= symfun(gradient(n,[x,y]),[x,y]);
