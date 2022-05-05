@@ -4,7 +4,10 @@
 %functions
 
 
-p = @(x,y,z) (N/t^3)*(beta0/pi)^(3/2).*exp(-beta0.*(x.^2+y.^2+z.^2)./t^2); %Boltzmann distribution
+%Boltzmann distribution
+p = @(x,y,z)(N/t^3)*(beta0/pi)^(3/2).*exp(-beta0.*(x.^2+y.^2+z.^2)./t^2);
+
+
 
 n = @(x,y,z) 1+p(x,y,z)*2*pi*alpha;
 
@@ -26,5 +29,3 @@ pos = [x0; y0; z0; Tx0; Ty0; Tz0];
 
 
 plot3d(pos,ngradn,n,1e-12);
-
-

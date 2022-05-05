@@ -11,40 +11,54 @@ lambda = 3e-6;
 nc = pi/(2*lambda^2*re);
 ne = R^2 *nc/(d*f); %Maximum electron density
 
-w0 = 1/2; %This makes it such that the thickness of the beam is approximately equal to the thickness of an ideal refractive index.
-
-zR = pi*w0^2*1/lambda; %This is the Rayleigh Range. 1 is a place holder for the refractive index. If we add this, then we can get an implicit equation for n. But right now I am interested in an approximate solution.
-w = @(y) w0*sqrt(1+(y/zR)^2);
 
 
+p = @(x,y,z) ne*exp(-2*(x^2+y^2)); %Gaussian focussed at (0,0). This is the electron density
 
-p = @(x,y) ne*(w0/(w(y)^2))*exp(-2*x^2/w(y)^2); %Gaussian focussed at (0,0). This is the electron density
+n = @(x,y,z) 1+p(x,y,z)/(2*nc);
+gradn= symfun(gradient(n,[x,y,z]),[x,y,z]);
 
-n = @(x,y) 1+p(x,y)/(2*nc);
-gradn= symfun(gradient(n,[x,y]),[x,y]);
-ngradn =@(x,y) double( n(x,y).*gradn(x,y));
+deltaT =int(gradn,x,-180,180);
 
+Tfinal = @(y,z) [1;0;0] + double(deltaT(y,z));
 
-gradx = symfun(diff(n,x),[x,y]);
-gradx = @(x,y) double(gradx(x,y));
-Tx = @(y) integral(@(x) gradx(x,y),-180,180);
-grady = symfun(diff(n,y),[x,y]);
-grady = @(x,y) double(grady(x,y));
-Ty = @(y) integral(@(x) grady(x,y),-180,180);
+x0 = 180;
 
+rayline = @(x,y0,z0) [x0;y0;z0] + Tfinal(y0,z0)*(x-x0);
+r = @(x,y0,z0) sqrt(subsref(rayline(x,y0,z0), struct('type', '()', 'subs', {{2}})).^2 + subsref(rayline(x,y0,z0), struct('type', '()', 'subs', {{3}})).^2);
 
-x0 = 0;       
-y0 = 0;       
-for i = 0:1:15
-    xend = x0-(y0+i)*(Tx(y0+i)+1)/(Ty(y0+i));
-    
-    plot([20;xend],[y0+i;0],'-.r')
-    hold on
+bestx = @(y0,z0) fminbnd(@(x) abs(r(x,y0,z0)),180,10000);
+best = @(y0,z0) r(bestx(y0,z0),y0,z0);
 
+y= linspace(-5,5,10);
+z= linspace(-5,5,10);
+[Y,Z] = meshgrid(y,z);
+finalx = 1e4;
+for i = 1:length(y)
+    for j = 1:length(z)
+        %Y(i,j) = best(y(i),z(j));
+        Y(i,j) = r(finalx,y(i),z(j));
+    end
 end
-name = ("Focal Length = "+f);
-p2 = plot([20;xend],[y0+i;0],'-.r','DisplayName',name);
-legend([p2])
+
+imagesc([min(y),max(y)],[min(z),max(z)],Y)
+colorbar
+xlabel("y0 (m)")
+ylabel("z0 (m)")
+title("Distance to x-axis at x="+finalx+"m")
+
+% x0 = 0;       
+% y0 = 0;       
+% for i = 0:1:1
+%     xend = x0-(y0+i)*(Tx(y0+i)+1)/(Ty(y0+i));
+%     
+%     plot([20;xend],[y0+i;0],'-.r')
+%     hold on
+% 
+% end
+% name = ("Focal Length = "+f);
+% p2 = plot([20;xend],[y0+i;0],'-.r','DisplayName',name);
+% legend([p2])
 
 
 

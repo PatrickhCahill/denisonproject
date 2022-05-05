@@ -1,7 +1,7 @@
 %% FISHEYE LENS CONVERGENCE TEST
 %Input pressure function and symbolic computes refractive index and other
 %functions
-
+init()
 n = @(x,y) 2/(1+(x.^2+y.^2)); %Newton's fisheye lens refractive index
 gradn= symfun(gradient(n,[x,y]),[x,y]);
 
