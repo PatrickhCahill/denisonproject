@@ -1,6 +1,6 @@
 %%Free Expansion
 global n
-n = 200; %Number of layers approximating
+n = 5; %Number of layers approximating
 
 
 r0 = 1;
@@ -43,17 +43,25 @@ open(vidObj)
 axis tight
 set(gca,'nextplot','replacechildren')
 
+ytickslist = [1];
+for ytick = 1:18
+    ytickslist = [yticks, 10^ytick];
+end
 
-for time = 1:5:length(t)
+
+for time =1:5:length(t)
 rfinals = w(time,:)';
 rfinals = rfinals(1:end/2);
+disp(rfinals)
 ps = pfinals(rfinals);
 
-plot(rfinals,ps,"-b")
+loglog(rfinals,ps,"-b")
 hold on
 
 xlim([0 25])
-%ylim([0 10^26])
+ylim([0 10^18])
+
+
 xlabel("Radius (m)")
 ylabel("Electron Number Density (m^{-3})")
 title("Electron Density vs Radius at t="+round(t(time)*1e12,0)+"ps. n="+n)
@@ -91,8 +99,8 @@ function dydt = gas0(t,y)
     end
     
     %
-    D = @(k) ((q.^2) * ne0 * (r0(k).^2)/me)*(1/(2*eps0)-mu*vd.^2);
-    C = @(k) ((3*pi.^2).^(2/3)*hbar.^2/(5*me))*(ne0*r0(1).^2).^(5/3);
+    D =((q.^2) * ne0 * (r0(1).^2)/(2*me))*(1/(eps0)-mu*vd.^2);
+    C =((3*pi.^2).^(2/3)*hbar.^2/(5*me))*(ne0*r0(1).^2).^(5/3)*(2/me)/(ne0*r0(1).^2);
     %Wrangling the data
     rs = y(1:end/2); %Gets radii
     ss = y(end/2+1:end); % and velocities
@@ -111,18 +119,16 @@ function dydt = gas0(t,y)
     
     %The first drs term is the is the inner most shell.
     drs = [ss(1)];
-    dss = [D(1)./rs(1) + C(1).*(rs(1).^3).*rs(1)^(-10/3)];
-    
+    dss = [D./rs(1) + C.*rs(1).*rs(1)^(-10/3)];
     %This loop then calculates the next dt step for the layers
     for k = 2:(n-1)
         drs = [drs; ss(k)];
-        dss = [dss;D(k)./rs(k) +  C(k).*(rs(k).^3).*(rhandled(k)-rhandled(k+1))];%Relevant ODE
+        dss = [dss;D*rs(k)/(rs(k).^2-rs(k-1).^2) +  C.*rs(k).*(rhandled(k)-rhandled(k+1))];%Relevant ODE
     end
     
     %This computes the outter most layer
     drs = [drs; ss(n)];
-    dss = [dss;((q.^2) * ne0 * (r0(k).^2)/me)*(1/(2*eps0)-mu*(vd.^2)/2)./rs(k) + C(k).*(rs(k).^3).*rhandled(k)]; %Old model
-    %dss = [dss;4*pi*rs(n)^2*R*Tn/(MM*((4*pi/3)*(rs(end)^3-rs(end-1)^3)))];
+    dss = [dss;2*D*rs(k)/(rs(k).^2-rs(k-1).^2) + C.*rs(k).*rhandled(k)]; %Old model
     dydt = [drs; dss];
 end
 
